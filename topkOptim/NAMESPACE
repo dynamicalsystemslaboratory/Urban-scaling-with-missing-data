@@ -1,0 +1,3 @@
+useDynLib(topkOptim, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
