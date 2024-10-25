@@ -1,4 +1,4 @@
-# Urban-scaling-with-missing-data
+# Urban-scaling-with-censored-data
 
 
 ## Repository Organization
@@ -30,10 +30,11 @@ The spreadsheet used to convert county codes to MSA/MicroSA resolution and the r
 ### Recovered Firearms 
 This folder contains the script "ATF_States.R" and "ATF_US.R" used in the recovered firearms case study. "ATF_States.R" is a script that uses the function `optim()` to find $\beta_{min}$ and $\beta_{max}$  for each state of the U.S., and "ATF_US.R" uses the function `optim_aggregate()` to find $\beta_{min}$ and $\beta_{max}$  for the U.S.
 The raw data used in this analyses reported by the ATF can be found in the folder "Data" or in the original source, as reported in the manuscript. The folder also contains the R script "relevant_data.R" that was used to process the scraped data from the ATF website ("hand_atf.csv") and the population data ("sub-est2022.csv") retrived from the the Census ``Incorporated Places and Minor Civil Divisions Datasets", as reported in the manuscript. 
+Additionaly the script "ATF_CI" computes the confidence intervals of $\beta_{min}$ and $\beta_{max}$ for for this case study.
 
 <br>
 
 ### Simulations
-This folder has the script and a copy of the results used in the simulations to assess the bias in urban scaling due to missing data.
+This folder has three other folders: "Additional_analysis", "Assessing_bias", and "Consistency". The "Additional_analysis" includes scripts for the analyses in Sections S3.2 and S4 of the Supporting Information. The second and third folders contain the script and a copy of the results used in the simulations to assess the bias and the consistency of the $\hat{\beta}^\mathrm{k}$ estimator in urban scaling due to censored data.
 
 
