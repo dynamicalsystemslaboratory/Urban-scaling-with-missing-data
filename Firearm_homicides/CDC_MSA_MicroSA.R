@@ -77,7 +77,7 @@ results <- future.apply::future_lapply(1:length(fileList_df), function(i) {
   steps <- total_deaths - deaths_nonMSA - sum(df_MSA_TopK$deaths) - sum(z0)   #y_left updated
 
   
-    z_starMAX <- inesOptim::optim(
+    z_starMAX <- topkOptim::optim(
       xr = xr,
       x = x,
       z0 = z0,
@@ -88,7 +88,7 @@ results <- future.apply::future_lapply(1:length(fileList_df), function(i) {
     )
     
     
-    z_starMIN <- inesOptim::optim(
+    z_starMIN <- topkOptim::optim(
       xr = xr,
       x = x,
       z0 = z0,
