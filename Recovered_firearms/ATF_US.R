@@ -1,4 +1,7 @@
 library(dplyr)
+library(ggplot2)
+library(scales)
+library(patchwork)
 
 
 # Data for the analyses
@@ -101,34 +104,122 @@ x <- c(xk, xr)
 
 
 
-# Add D.C.
+# Add D.C
 x = c(x, 689546)
 y_starMAX = c(y_starMAX, 1345)  
 y_starMIN = c(y_starMIN, 1345)
 
 
 combined_results <- data.frame(x = x, y_starMAX = y_starMAX, y_starMIN = y_starMIN)
+#saveRDS(combined_results_ATF, file = "combined_results.rds")
+
+
+# Read RDS
+combined_results <- readRDS("...\combined_results.rds")   
 
 
 lmUS_MAX <- lm(log(y_starMAX) ~ log(x), data = combined_results)
 lmUS_MIN <- lm(log(y_starMIN) ~ log(x), data = combined_results)
 
-beta_min <- lmUS_MIN$coefficients[2]
-beta_max <- lmUS_MAX$coefficients[2]
+
+eq_max <- paste("β =", round(coef(lmUS_MAX)[2], 3), " \nR² =", round(summary(lmUS_MAX)$r.squared, 3))
+eq_min <- paste("β =", round(coef(lmUS_MIN)[2], 3), " \nR² =", round(summary(lmUS_MIN)$r.squared, 3))
+
+beta_max <- round(coef(lmUS_MAX)[2], 3)
+beta_min <- round(coef(lmUS_MIN)[2], 3)
+
+r_squared_max <- round(summary(lmUS_MAX)$r.squared, 3)
+r_squared_min <- round(summary(lmUS_MIN)$r.squared, 3)
+
+
+combined_results <- combined_results[combined_results$x > 1, ]
+
+
+#---------------
+
+plot_max <- ggplot(combined_results, aes(x = x, y = y_starMAX)) +
+  geom_point(size = 0.2, color = "black", alpha = 1) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#e66101", ymin = 10, size = 0.7) +
+  labs(x = "Population", y = "Optimized Y") +
+  annotate("text", x = (min(combined_results$x) + 2), y = 10000, 
+           label = bquote(atop(hat(beta)[max] == .(beta_max),R^2 == .(r_squared_max))),
+           hjust = 0, size = 3, color = "black") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 10, angle = 0, hjust = 0.5),
+    axis.text.y = element_text(size = 10, angle = 0, hjust = 0.5),
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    plot.margin = margin(0.2, 0.2, 0.2, 0.2, "cm"),
+    legend.position = "none",
+    axis.ticks = element_line(size = 0.4, linewidth = 0.8, color = "black"),
+    axis.line = element_line(color = "black")
+  ) +
+  scale_x_continuous(
+    trans = log10_trans(), 
+    labels = trans_format("log10", math_format(10^.x)),
+    limits = c(10^0, 10^8),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    trans = log10_trans(), 
+    labels = trans_format("log10", math_format(10^.x)),
+    limits = c(10^-1, 10^5),
+    expand = c(0, 0)
+  )+
+  coord_cartesian(clip = 'off')
+
+plot_min <- ggplot(combined_results, aes(x = x, y = y_starMIN)) +
+  geom_point(size = 0.2, color = "black", alpha = 1) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "#fdb863", ymin = 0, size = 0.7) +
+  labs(x = "Population", y = "Optimized Y") +
+  annotate("text", x = (min(combined_results$x) + 2), y = 10000, 
+           label = bquote(atop(hat(beta)[min] == .(beta_min),R^2 == .(r_squared_min))),
+           hjust = 0, size = 3, color = "black") +
+  theme_minimal() +
+  theme(
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(size = 10, angle = 0, hjust = 0.5),
+    axis.text.y = element_text(size = 10, angle = 0, hjust = 0.5),
+    panel.grid = element_blank(),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    plot.margin = margin(0.2, 0.2, 0.2, 0.2, "cm"),
+    legend.position = "none",
+    axis.ticks = element_line(size = 0.4, linewidth = 0.8, color = "black"),
+    axis.line = element_line(color = "black")
+  ) +
+  scale_x_continuous(
+    trans = log10_trans(), 
+    labels = trans_format("log10", math_format(10^.x)),
+    limits = c(10^0, 10^8),
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    trans = log10_trans(), 
+    labels = trans_format("log10", math_format(10^.x)),
+    limits = c(10^-1, 10^5),
+    expand = c(0, 0)
+  )+
+  coord_cartesian(clip = 'off')
 
 
 
+#Save the plot
+png(file = "ATF_combined.png", width = 180, height = 100, units = "mm", res = 300)
 
+comb_plot <- plot_min + plot_max +
+  plot_annotation(
+    tag_levels = list(c('A', 'B')),
+    tag_prefix = "",
+    theme = theme(
+      plot.tag = element_text(size = 16, face = "bold"),
+      plot.margin = margin(0.2, 0.2, 0.2, 0.2, "cm")
+    )
+  )
+print(comb_plot)
 
-
-
-
-
-
-
-
-
-
+dev.off()
 
 
 
